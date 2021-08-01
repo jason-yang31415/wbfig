@@ -13,26 +13,38 @@ if __name__ == "__main__":
     parser.add_argument(
         "--edit_align",
         "-ea",
-        action="store_true",
+        nargs="?",
+        const=True,
         help="show prompts to modify layout parameters for alignment only",
     )
     parser.add_argument(
         "--edit_crop",
         "-ec",
-        action="store_true",
+        nargs="?",
+        const=True,
         help="show prompts to modify layout parameters for cropping only",
     )
     parser.add_argument(
         "--edit_ladder",
         "-el",
-        action="store_true",
+        nargs="?",
+        const=True,
         help="show prompts to modify layout parameters for ladder positions only",
     )
     args = parser.parse_args()
+
+    ea = args.edit_align.split(",") if type(args.edit_align) is str else args.edit_align
+    ec = args.edit_crop.split(",") if type(args.edit_crop) is str else args.edit_crop
+    el = (
+        args.edit_ladder.split(",")
+        if type(args.edit_ladder) is str
+        else args.edit_ladder
+    )
+
     edit = {
-        "align": args.edit_align or args.edit,
-        "crop": args.edit_crop or args.edit,
-        "ladder": args.edit_ladder or args.edit,
+        "align": args.edit or ea,
+        "crop": args.edit or ec,
+        "ladder": args.edit or el,
     }
 
     layout = read_layout_spec(args.layout_file)

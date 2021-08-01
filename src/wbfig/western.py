@@ -840,6 +840,14 @@ def save_cache(path, cache):
         pickle.dump(cache, f)
 
 
+def should_edit(name, edit):
+    if edit == True:
+        return True
+    if type(edit) == list and name in edit:
+        return True
+    return False
+
+
 def align(layout, cache, save_cache, edit=None):
     """obtain required position, rotation, and cropping information"""
     if edit is None:
@@ -852,7 +860,7 @@ def align(layout, cache, save_cache, edit=None):
     # 1. Align entire exposures within each stack
     for name, stack in layout.stacks.items():
         stack.load_cache(cache)
-        if stack.needs_align() or edit["align"]:
+        if stack.needs_align() or should_edit(name, edit["align"]):
             print(
                 f"""
 Edit alignment for exposures in stack {name}.
@@ -888,7 +896,7 @@ enter\tfinish editing alignment
     for name, crop in layout.crops.items():
         crop.load_cache(cache)
         ref = crop._exp[0].stack.get_reference()
-        if crop.needs_align() or edit["align"]:
+        if crop.needs_align() or should_edit(name, edit["align"]):
             print(
                 f"""
 Edit alignment for exposures in crop {name}.
@@ -921,7 +929,7 @@ enter\tfinish editing alignment
             crop.set_alignment(alignment)
 
         # TODO: show reference if not part of crop
-        if crop.needs_crop() or edit["crop"]:
+        if crop.needs_crop() or should_edit(name, edit["crop"]):
             print(
                 f"""
 Edit bounding box for crop {name}. Right-click four times to mark left, right,
@@ -943,7 +951,7 @@ enter\tfinish editing bounding box
             crop.set_crop_transform(crop_transform)
 
         # TODO: show reference if not part of crop
-        if crop.needs_ladder() or edit["ladder"]:
+        if crop.needs_ladder() or should_edit(name, edit["ladder"]):
             print(
                 f"""
 Edit ladder positions for crop {name}. Right-click to mark ladder positions. Use
